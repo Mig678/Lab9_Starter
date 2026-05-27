@@ -6,7 +6,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lab 9</title>
-
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS &&
+      TrackJS.install({
+        token: "2004894b6a5844be93db7374084fb391"
+      });
+  </script>
   <style>
     button {
       margin: 3px;
@@ -89,19 +95,182 @@
 
   <script>
     let form = document.querySelector('form');
+    class CalculatorError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'CalculatorError';
+  }
+}
+
     form.addEventListener('submit', e => {
       e.preventDefault();
+
       let output = document.querySelector('output');
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+
+      try {
+        if (firstNum === '' || secondNum === '') {
+          throw new CalculatorError('Both numbers are required');
+        }
+
+        firstNum = Number(firstNum);
+        secondNum = Number(secondNum);
+
+        if (Number.isNaN(firstNum) || Number.isNaN(secondNum)) {
+          throw new CalculatorError('Inputs must be valid numbers');
+        }
+
+        if (operator === '/' && secondNum === 0) {
+          throw new CalculatorError('Cannot divide by zero');
+        }
+
+        let result;
+
+        if (operator === '+') {
+          result = firstNum + secondNum;
+        } else if (operator === '-') {
+          result = firstNum - secondNum;
+        } else if (operator === '*') {
+          result = firstNum * secondNum;
+        } else if (operator === '/') {
+          result = firstNum / secondNum;
+        } else {
+          throw new CalculatorError('Unknown operator');
+        }
+
+        output.textContent = result;
+        console.log('Calculation worked:', result);
+      } catch (err) {
+        output.textContent = err.message;
+        console.error(`${err.name}: ${err.message}`);
+      } finally {
+        console.log('Calculator finished running');
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
     // Start your code here
     // You may move this JS to another file if you wish
+
+    // Console Log
+    errorBtns[0].addEventListener('click', () => {
+      console.log('Console Log: button was clicked');
+    });
+
+    // Console Error
+    errorBtns[1].addEventListener('click', () => {
+      console.error('Console Error: something went wrong with the calculator');
+    });
+
+    // Console Count
+    errorBtns[2].addEventListener('click', () => {
+      console.count('Console Count button clicked');
+    });
+
+    // Console Warn
+    errorBtns[3].addEventListener('click', () => {
+      console.warn('Console Warn: input might be missing or invalid');
+    });
+
+    // Console Assert
+    errorBtns[4].addEventListener('click', () => {
+      let firstNum = document.querySelector('#first-num').value;
+      console.assert(firstNum !== '', 'Console Assert: first number is empty');
+    });
+
+    // Console Clear
+    errorBtns[5].addEventListener('click', () => {
+      console.clear();
+    });
+
+    // Console Dir
+    errorBtns[6].addEventListener('click', () => {
+      let calculatorForm = document.querySelector('form');
+      console.dir(calculatorForm);
+    });
+
+    // Console dirxml
+    errorBtns[7].addEventListener('click', () => {
+      let calculatorForm = document.querySelector('form');
+      console.dirxml(calculatorForm);
+    });
+
+    // Console Group Start
+    errorBtns[8].addEventListener('click', () => {
+      console.group('Calculator Info');
+      console.log('This group shows calculator data');
+      console.log('First input:', document.querySelector('#first-num').value);
+      console.log('Operator:', document.querySelector('#operator').value);
+      console.log('Second input:', document.querySelector('#second-num').value);
+    });
+
+    // Console Group End
+    errorBtns[9].addEventListener('click', () => {
+      console.log('End of calculator group');
+      console.groupEnd();
+    });
+
+    // Console Table
+    errorBtns[10].addEventListener('click', () => {
+      let calculatorData = [
+        {
+          input: 'first number',
+          value: document.querySelector('#first-num').value || 'empty'
+        },
+        {
+          input: 'operator',
+          value: document.querySelector('#operator').value
+        },
+        {
+          input: 'second number',
+          value: document.querySelector('#second-num').value || 'empty'
+        }
+      ];
+
+      console.table(calculatorData);
+    });
+
+    // Start Timer
+    errorBtns[11].addEventListener('click', () => {
+      console.time('calculator timer');
+      console.log('Timer started');
+    });
+
+    // End Timer
+    errorBtns[12].addEventListener('click', () => {
+      console.timeEnd('calculator timer');
+    });
+
+    // Console Trace
+    errorBtns[13].addEventListener('click', () => {
+      function firstFunction() {
+        secondFunction();
+      }
+
+      function secondFunction() {
+        console.trace('Console Trace: showing how we got here');
+      }
+
+      firstFunction();
+    });
+
+    window.onerror = function (message, source, lineno, colno, error) {
+      console.log('Global Error Handler: caught an error');
+      console.log('Message:', message);
+      console.log('Source:', source);
+      console.log('Line:', lineno);
+      console.log('Column:', colno);
+      console.log('Error object:', error);
+
+      return true;
+    };
+
+    errorBtns[14].addEventListener('click', () => {
+      missingFunction();
+    });
   </script>
 </body>
 
